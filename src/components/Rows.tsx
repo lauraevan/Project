@@ -1,55 +1,71 @@
+import { useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Link } from '@tanstack/react-router'
-import { img, list, titleOf, typeOf, yearOf, type Item } from '../lib/tmdb'
+import { motion } from 'motion/react'
+import { list, type Item } from '../lib/tmdb'
+import { MediaCard, type CardVariant } from './MediaCard'
+import { ChevronIcon } from './Icons'
 
-export function Row({
-  title,
-  path,
-  variant,
-  params,
-}: {
+interface RowProps {
   title: string
-  path: string
-  variant: 'wide' | 'poster'
+  variant: CardVariant
+  path?: string
   params?: Record<string, string>
-}) {
-  const q = useQuery({ queryKey: ['list', path, params], queryFn: () => list(path, params) })
-  const items = (q.data ?? []).filter((i) => (variant === 'wide' ? i.backdrop_path : i.poster_path))
-
-  return (
-    <section className="row">
-      <h2>{title}</h2>
-      <div className="scroller">
-        {q.isPending &&
-          Array.from({ length: 6 }, (_, n) => (
-            <div key={n} className={`skeleton ${variant === 'wide' ? 'card-wide' : 'card-poster'}`} />
-          ))}
-        {items.map((i) => (
-          <Card key={i.id} item={i} variant={variant} />
-        ))}
-        {q.isError && <p style={{ color: 'var(--fg-dim)' }}>Couldn&apos;t load this row.</p>}
-      </div>
-    </section>
-  )
+  items?: Item[]
+  eyebrow?: string
 }
 
-function Card({ item, variant }: { item: Item; variant: 'wide' | 'poster' }) {
-  const type = typeOf(item)
-  const to = { to: '/title/$type/$id' as const, params: { type, id: String(item.id) } }
-  if (variant === 'wide') {
-    return (
-      <Link {...to} className="card-wide lift" style={{ backgroundImage: `url(${img(item.backdrop_path, 'w500')})` }}>
-        <div className="glass card-cap">
-          <span>{titleOf(item)}</span>
-          <span>{yearOf(item)}</span>
-        </div>
-      </Link>
-    )
+export function Row({ title, variant, path, params, items, eyebrow }: RowProps) {
+  const q = useQuery({
+    queryKey: ['list', path, params],
+    queryFn: () => list(path!, params),
+    enabled: !!path && !items,
+  })
+  const scroller = useRef<HTMLDivElement>(null)
+
+  const source = items ?? q.data ?? []
+  const shown = source
+    .filter((i) => (variant === 'wide' ? i.backdrop_path || i.poster_path : i.poster_path || i.backdrop_path))
+    .slice(0, variant === 'top10' ? 10 : 20)
+
+  if (items && shown.length === 0) return null
+
+  const scrollBy = (dir: 1 | -1) => {
+    const el = scroller.current
+    if (el) el.scrollBy({ left: dir * el.clientWidth * 0.82, behavior: 'smooth' })
   }
+
   return (
-    <Link {...to} className="card-poster lift" style={{ backgroundImage: `url(${img(item.poster_path, 'w342')})` }}>
-      <div className="poster-shade" />
-      <span className="poster-title">{titleOf(item)}</span>
-    </Link>
+    <motion.section
+      className="row"
+      initial={{ opacity: 0, y: 36 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.8, ease: [0.2, 0.8, 0.2, 1] }}
+    >
+      <div className="row-head">
+        <div>
+          {eyebrow && <span className="eyebrow">{eyebrow}</span>}
+          <h2>{title}</h2>
+        </div>
+        <div className="row-arrows">
+          <button className="glass icon-btn press" aria-label={`Scroll ${title} left`} onClick={() => scrollBy(-1)}>
+            <ChevronIcon dir="left" width={18} height={18} />
+          </button>
+          <button className="glass icon-btn press" aria-label={`Scroll ${title} right`} onClick={() => scrollBy(1)}>
+            <ChevronIcon dir="right" width={18} height={18} />
+          </button>
+        </div>
+      </div>
+      <div className="scroller" ref={scroller}>
+        {q.isPending && !items &&
+          Array.from({ length: 8 }, (_, n) => (
+            <div key={n} className={`skeleton ${variant === 'wide' ? 'card-wide' : 'card-poster'}`} />
+          ))}
+        {shown.map((i, n) => (
+          <MediaCard key={`${i.id}-${n}`} item={i} variant={variant} rank={n + 1} />
+        ))}
+        {q.isError && <p className="muted">Couldn&apos;t load this row.</p>}
+      </div>
+    </motion.section>
   )
 }

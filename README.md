@@ -3,6 +3,15 @@
 A streaming-app front end with a Liquid Glass look: Vite + React + TypeScript, TanStack Router/Query, Motion.
 Catalog, artwork and trailer links come from [TMDB](https://www.themoviedb.org). This product uses the TMDB API but is not endorsed or certified by TMDB.
 
+## What's in it
+
+- Auto-advancing hero with title logos, ratings, genres and a progress dock; parallax and Ken Burns motion
+- Liquid Glass UI: scroll-condensing nav with a sliding active pill, glass chips, captions and panels
+- tvOS-style cards that tilt toward the pointer with a specular highlight; Top 10 row
+- Title pages with trailer playback, season/episode browser, related titles, details and cast
+- Search (press `/`), My List and Recently viewed (saved locally on the device)
+- Reduced-motion support, keyboard focus states, skip link, responsive down to phones
+
 ## Run locally
 
 ```bash

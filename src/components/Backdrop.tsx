@@ -1,22 +1,11 @@
-// Slowly drifting colored light behind the content: the "ambient" layer of the Liquid Glass look.
+// Slowly drifting colored light behind the content: the "ambient" layer that gives Liquid Glass something to refract.
 export function Ambient() {
   return (
-    <>
-      <div
-        className="orb1"
-        style={{
-          position: 'absolute', left: '46%', top: -140, width: 860, height: 860, borderRadius: '50%',
-          background: 'radial-gradient(circle at 40% 40%, var(--glow), transparent 66%)', opacity: 0.55, pointerEvents: 'none',
-        }}
-      />
-      <div
-        className="orb2"
-        style={{
-          position: 'absolute', left: -180, top: 380, width: 760, height: 760, borderRadius: '50%',
-          background: 'radial-gradient(circle at 50% 50%, #1f6fff, transparent 64%)', opacity: 0.4, pointerEvents: 'none',
-        }}
-      />
-    </>
+    <div className="ambient" aria-hidden="true">
+      <div className="orb orb1" />
+      <div className="orb orb2" />
+      <div className="orb orb3" />
+    </div>
   )
 }
 
@@ -30,7 +19,7 @@ export function ErrorNotice({ error }: { error: unknown }) {
       {needsToken && (
         <p>
           Set <code>TMDB_TOKEN</code> in a local <code>.env</code> file (see <code>.env.example</code>) or in your
-          Vercel project&apos;s environment variables, then restart.
+          host&apos;s environment variables, then restart.
         </p>
       )}
     </div>
