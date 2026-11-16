@@ -1,4 +1,5 @@
-// Vercel serverless function: server-side proxy for TMDB so the token stays secret.
+// Server-side proxy for TMDB so the token stays secret. Used as a Vercel function (/api/tmdb)
+// and by server.mjs on Render.
 // Usage: /api/tmdb?path=/trending/all/week&language=en-US
 
 const ALLOWED = [
@@ -12,7 +13,7 @@ const ALLOWED = [
   /^\/genre\/(movie|tv)\/list$/,
 ]
 
-export async function GET(request: Request): Promise<Response> {
+export async function GET(request) {
   const token = process.env.TMDB_TOKEN
   if (!token) return json({ error: 'TMDB_TOKEN is not configured' }, 500)
 
@@ -35,7 +36,7 @@ export async function GET(request: Request): Promise<Response> {
   })
 }
 
-function json(body: unknown, status: number) {
+function json(body, status) {
   return new Response(JSON.stringify(body), {
     status,
     headers: { 'Content-Type': 'application/json' },
