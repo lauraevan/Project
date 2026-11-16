@@ -64,7 +64,7 @@ export function SearchPage() {
                 variants={{ hide: { opacity: 0, y: 18 }, show: { opacity: 1, y: 0 } }}
                 transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
               >
-                <MediaCard item={i} variant="poster" />
+                <MediaCard item={i} variant="poster" meta />
               </motion.div>
             ))}
           </motion.div>

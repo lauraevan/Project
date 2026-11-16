@@ -24,7 +24,7 @@ export function MyList() {
         ) : (
           <div className="grid">
             {items.map((i) => (
-              <MediaCard key={`${i.media_type}-${i.id}`} item={i} variant="poster" />
+              <MediaCard key={`${i.media_type}-${i.id}`} item={i} variant="poster" meta />
             ))}
           </div>
         )}
